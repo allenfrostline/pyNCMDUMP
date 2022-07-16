@@ -6,8 +6,17 @@ import os
 import sys
 from Crypto.Cipher import AES
 
+def existing_mp3(file_path):
+    file_name = os.path.splitext(file_path)[0]
+    
+    return os.path.exists(file_name + ".mp3") or os.path.exists(file_name + ".flac")
+
+
 
 def dump(file_path):
+    if existing_mp3(file_path):
+        print('转换文件已存在，跳过\n')
+        return
     # hex to str
     core_key = binascii.a2b_hex("687A4852416D736F356B496E62617857")
     meta_key = binascii.a2b_hex("2331346C6A6B5F215C5D2630553C2728")
@@ -78,4 +87,5 @@ def dump(file_path):
 if __name__ == '__main__':
     file_list = sys.argv[1:]
     for file in file_list:
+        print(f'正在处理：{file}')
         dump(file)
