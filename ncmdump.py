@@ -92,7 +92,6 @@ def go_dump(file_list):
 
 if __name__ == '__main__':
     file_list = sys.argv[1:]
-    print(file_list)
     for file in file_list:
         if os.path.isfile(file):
             print(f'正在处理：{file}')
