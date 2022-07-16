@@ -4,6 +4,7 @@ import base64
 import json
 import os
 import sys
+import platform
 import glob
 from Crypto.Cipher import AES
 
