@@ -4,6 +4,7 @@ import base64
 import json
 import os
 import sys
+import glob
 from Crypto.Cipher import AES
 
 def existing_mp3(file_path):
@@ -83,9 +84,17 @@ def dump(file_path):
     f.close()
     return file_name
 
-
-if __name__ == '__main__':
-    file_list = sys.argv[1:]
+def go_dump(file_list):
     for file in file_list:
         print(f'正在处理：{file}')
         dump(file)
+
+if __name__ == '__main__':
+    file_list = sys.argv[1:]
+    print(file_list)
+    for file in file_list:
+        if os.path.isfile(file):
+            print(f'正在处理：{file}')
+            dump(file)
+        elif os.path.isdir(file):
+            go_dump(glob.glob(file + '*.ncm'))
