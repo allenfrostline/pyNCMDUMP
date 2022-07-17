@@ -1,2 +1,6 @@
 #!/bin/zsh
-python3 /Users/lll/github/pyNCMDUMP/ncmdump.py "/Users/lll/Music/网易云音乐/"
+folder =  /Users/lll/Music/网易云音乐/
+
+cd "$(dirname "$(greadlink -f "$0")")"
+
+./ncmdump $folder
