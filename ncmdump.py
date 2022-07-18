@@ -97,4 +97,4 @@ if __name__ == '__main__':
             print(f'正在处理：{file}')
             dump(file)
         elif os.path.isdir(file):
-            go_dump(glob.glob(file + '*.ncm'))
+            go_dump(glob.glob(os.path.join(file , '*.ncm')))
