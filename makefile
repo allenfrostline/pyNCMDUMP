@@ -1,14 +1,21 @@
 source = ncmdump.py
+OS := $(shell uname)
+
 ifeq ($(OS), Windows_NT)
 	excutable = ncmdump.exe
 else
 	excutable = ncmdump
 endif
 
+ifeq ($(OS), Linux)
+	command = python3 -m PyInstaller $(source) -F
+else
+	command = pyinstaller $(source) -F
+endif
+
 $(excutable): $(source)
-	
-	pyinstaller $(source) -F 
-	rm ./$(excutable)
+	$(command)
+	-rm ./$(excutable)
 	cp ./dist/$(excutable) ./$(excutable)
 
 
