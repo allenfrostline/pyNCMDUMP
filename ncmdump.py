@@ -82,7 +82,6 @@ def dump(file_path):
     return file_name
 
 def go_dump(file_list):
-    print(file_list)
     for f in file_list:
         print(f'正在处理：{f}')
         dump(f)
@@ -91,10 +90,8 @@ def go_dump(file_list):
 if __name__ == '__main__':
     file_list = sys.argv[1:]
     for file in file_list:
-        print(file)
         if os.path.isfile(file):
             print(f'正在处理：{file}')
             dump(file)
         elif os.path.isdir(file):
-            print(file)
             go_dump(glob.glob(os.path.join(file, '*.ncm')))
