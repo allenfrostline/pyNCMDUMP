@@ -4,16 +4,12 @@ import base64
 import json
 import os
 import sys
-import platform
 import glob
 from Crypto.Cipher import AES
 
 def existing_mp3(file_path):
-    file_name = os.path.splitext(file_path)[0]
-    
+    file_name = os.path.splitext(file_path)[0]    
     return os.path.exists(file_name + ".mp3") or os.path.exists(file_name + ".flac")
-
-
 
 def dump(file_path):
     if existing_mp3(file_path):
@@ -86,15 +82,19 @@ def dump(file_path):
     return file_name
 
 def go_dump(file_list):
-    for file in file_list:
-        print(f'正在处理：{file}')
-        dump(file)
+    print(file_list)
+    for f in file_list:
+        print(f'正在处理：{f}')
+        dump(f)
+
 
 if __name__ == '__main__':
     file_list = sys.argv[1:]
     for file in file_list:
+        print(file)
         if os.path.isfile(file):
             print(f'正在处理：{file}')
             dump(file)
         elif os.path.isdir(file):
-            go_dump(glob.glob(os.path.join(file , '*.ncm')))
+            print(file)
+            go_dump(glob.glob(os.path.join(file, '*.ncm')))
