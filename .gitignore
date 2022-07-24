@@ -1,5 +1,6 @@
 /dist
 /build
+/.vscode
 *.spec
 *.exe
 ncmdump

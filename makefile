@@ -7,11 +7,7 @@ else
 	excutable = ncmdump
 endif
 
-ifeq ($(OS), Linux)
-	command = python3 -m PyInstaller $(source) -F
-else
-	command = pyinstaller $(source) -F
-endif
+command = pyinstaller $(source) -F
 
 $(excutable): $(source)
 	$(command)
