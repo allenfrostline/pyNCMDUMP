@@ -1,20 +1,31 @@
-import binascii
-import struct
 import base64
+import binascii
+import glob
 import json
 import os
+import struct
 import sys
-import glob
+
+from time import sleep, localtime, strftime
+from multiprocessing import Pool, cpu_count
+from random import uniform
 from Crypto.Cipher import AES
 
+
+def time():
+    return strftime("%Y-%m-%d %H:%M:%S", localtime())
+
+
 def existing_mp3(file_path):
-    file_name = os.path.splitext(file_path)[0]    
+    file_name = os.path.splitext(file_path)[0]
     return os.path.exists(file_name + ".mp3") or os.path.exists(file_name + ".flac")
+
 
 def dump(file_path):
     if existing_mp3(file_path):
-        print('转换文件已存在，跳过\n')
+        print(f'[{time()}][Error]转换文件已存在，跳过\n')
         return
+    print(f"[{time()}][Dump]正在处理文件 {file_path}\n")
     # hex to str
     core_key = binascii.a2b_hex("687A4852416D736F356B496E62617857")
     meta_key = binascii.a2b_hex("2331346C6A6B5F215C5D2630553C2728")
@@ -79,20 +90,92 @@ def dump(file_path):
         m.write(chunk)
     m.close()
     f.close()
+    print(f"[{time()}][Dump] {file_path} 处理完成\n")
     return file_name
 
-def go_dump(file_list):
-    for f in file_list:
-        print(f'正在处理：{f}')
+
+def go_dump(f_list):
+    for f in f_list:
+        print(f'[{time()}][Main] 正在处理文件 {f}\n')
         dump(f)
 
 
+def main(t1):
+    try:
+        for file in t1:
+            if os.path.isfile(file):
+                print(f'[{time()}][Main] 正在处理文件 {file}\n')
+                dump(file)
+            elif os.path.isdir(file):
+                files = glob.glob(os.path.join(os.path.join(file, '**'), '*.ncm'), recursive=True)
+                go_dump(files)
+    except KeyboardInterrupt:
+        return None
+
+
 if __name__ == '__main__':
+    print(
+        "            _  _  ___ __  __ ___  _   _ __  __ ___ \n",
+        "  _ __ _  _| \| |/ __|  \/  |   \| | | |  \/  | _ \ \n",
+        " | '_ \ || | .` | (__| |\/| | |) | |_| | |\/| |  _/ \n",
+        " | .__/\_, |_|\_|\___|_|  |_|___/ \___/|_|  |_|_|   \n",
+        " |_|   |__/                                         \n",
+        "                     pyNCMDUMP                      \n",
+        "     https://github.com/allenfrostline/pyNCMDUMP    \n"
+    )
     file_list = sys.argv[1:]
-    for file in file_list:
-        if os.path.isfile(file):
-            print(f'正在处理：{file}')
-            dump(file)
-        elif os.path.isdir(file):
-            files = glob.glob(os.path.join(os.path.join(file,'**'),'*.ncm'),recursive=True)
-            go_dump(files)
+    sleep(uniform(1, 3))
+    print(f"[{time()}][Init]检测核心数量......")
+    cpus = cpu_count()
+    sleep(uniform(0, 1))
+    print(f"[{time()}][Init]检测到 {cpus} 个核心。")
+    processes = cpus - 1
+    sleep(uniform(0, 2))
+    print(f"[{time()}][MXP] 使用 {processes} 个进程。")
+    sleep(uniform(0, 1))
+    print(f"[{time()}][MXP]您可以通过修改源码第 132 行来修改使用的进程数量，但我们不推荐您这样做。")
+    sleep(uniform(0, 1))
+    print(f"[{time()}][MXP]初始化进程池......")
+    pool = Pool(processes=processes)
+    sleep(uniform(0, 1))
+    print(f"[{time()}][MXP]初始化线程池完成。")
+    sleep(uniform(0, 1))
+    print(f"[{time()}][Main]开始处理文件......\n")
+    if len(file_list) == 1:
+        for f in file_list:
+            print(f"[{time()}][Main]待处理文件 1 个。")
+            if os.path.isfile(f):
+                main(file_list)
+            elif os.path.isdir(f):
+                files = glob.glob(os.path.join(os.path.join(f, '**'), '*.ncm'), recursive=True)
+                number = len(files)
+                print(f"[{time()}][Main]待处理文件 {number} 个。")
+                single = number // processes + 1
+                try:
+                    for fil in range(0, number, single):
+                        single_files = files[fil:fil + number]
+                        pool.apply_async(main, (single_files,))
+                    pool.close()
+                    pool.join()
+                except KeyboardInterrupt:
+                    pid = os.getpid()
+                    os.popen('taskkill.exe /f /pid:%d' % pid)
+                except Exception as e:
+                    print(e)
+    elif len(file_list) > 1:
+        number = len(file_list)
+        try:
+            for f in file_list:
+                if os.path.isfile(f):
+                    print(f"[{time()}][Main]待处理文件 {number} 个。")
+                    pool.apply_async(main, f)
+                elif os.path.isdir(f):
+                    # 这会平添很多麻烦。何不直接传入一整个文件夹呢？
+                    raise ImportError("不允许在有多个输入时混杂文件夹")
+            pool.close()
+            pool.join()
+        except KeyboardInterrupt:
+            pid = os.getpid()
+            os.popen('taskkill.exe /f /pid:%d' % pid)
+        except Exception as e:
+            print(e)
