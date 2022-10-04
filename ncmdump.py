@@ -40,7 +40,9 @@ log.addHandler(handler)
 def dump_single_file(filepath):
     try:
 
-        filename = filepath.split('/')[-1][:-4]
+        filename = filepath.split('/')[-1]
+        if not filename.endswith('.ncm'): return
+        filename = filename[:-4]
         for ftype in ['mp3', 'flac']:
             fname = f'{filename}.{ftype}'
             if os.path.isfile(fname):
@@ -103,7 +105,7 @@ def dump_single_file(filepath):
             image_size = f.read(4)
             image_size = struct.unpack('<I', bytes(image_size))[0]
             image_data = f.read(image_size)
-            target_filename = f.name.split('/')[-1].split('.ncm')[0] + '.' + meta_data['format']
+            target_filename = filename + '.' + meta_data['format']
 
             with open(target_filename, 'wb') as m:
                 chunk = bytearray()
