@@ -151,8 +151,13 @@ def dump(*paths, n_workers=None):
     all_filepaths = [fp for p in paths for fp in list_filepaths(p)]
     if n_workers > 1:
         log.info(f'Running pyNCMDUMP with up to {n_workers} parallel workers')
-        with Pool(processes=n_workers) as p:
-            list(p.map(dump_single_file, all_filepaths))
+        try:
+            with Pool(processes=n_workers) as p:
+                list(p.map(dump_single_file, all_filepaths))
+        except KeyboardInterrupt:
+            if sys.platform == 'Windows':  # not needed for unix platforms
+                os.popen(f'taskkill.exe /f /pid:{os.getpid()}')
+            quit()
     else:
         log.info('Running pyNCMDUMP on single-worker mode')
         for fp in tqdm(all_filepaths, leave=False): dump_single_file(fp)
@@ -174,7 +179,7 @@ if __name__ == '__main__':
         '-w', '--workers',
         metavar='',
         type=int,
-        help=f'parallel convertion when set to more than 1 workers (default: 1)',
+        help=f'parallel conversion when set to more than 1 workers (default: 1)',
         default=1
     )
     args = parser.parse_args()
