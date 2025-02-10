@@ -1,3 +1,28 @@
+### Update `ncm_converter.py` file (Feb 2025)
+
+Changes:
+1. The [PyCrypto](https://www.pycrypto.org) package is no longer activaly maintained. So the latest version change to the [Cryptography](https://pypi.org/project/cryptography/), which can be installed through `pip install cryptography`.
+2. Added some additional command line options support. You can now choose the target folder you want to output to, and the timestamps to only process files created after this time.
+
+```
+$ python3 ncmdump.py --help
+
+
+  usage: ncmdump.py [-h] [-w] paths [paths ...]
+
+  pyNCMDUMP command-line interface
+
+  positional arguments:
+    paths            one or more paths to source files
+
+  optional arguments:
+      -h, --help            show this help message and exit
+      -w , --workers        parallel convertion when set to more than 1 workers (default: 1)
+      -t , --target-folder
+                        optional target folder for converted files (default: same as source file)
+      -a , --after          optional timestamp in yymmddhhmm format to only process files created after this time
+```
+
 # pyNCMDUMP
 
 This is a simple commandline tool that helps you convert an encrypted `.ncm` file into its original, more commonly seen audio types (e.g. `flac` and `mp3`). 
